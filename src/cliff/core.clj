@@ -36,7 +36,10 @@
 (defn- seq-diff [s1 s2]
   (map-diff (seq->map s1) (seq->map s2)))
 
-(defn diff [f1 f2]
+(defn diff
+  "Given two forms `f1` and `f2`, returns a patch – a map representing the
+   changes that must be made to `f1` in order to produce `f2`."
+  [f1 f2]
   (let [forms [f1 f2]]
     (cond (= f1 f2) {:keep f1}
           (every? map? forms) (map-diff f1 f2)
