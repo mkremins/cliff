@@ -10,13 +10,12 @@
         idents  (set (filter #(= (get m1 %) (get m2 %)) ks1))
         ks1     (set/difference ks1 idents)
         ks2     (set/difference ks2 idents)
-        renames (loop [ks ks1 renames {}]
-                  (if-let [old-k (first ks)]
-                    (let [same-v  (get m1 old-k)
-                          new-k   (first (filter #(= (get m2 %) same-v) ks2))
-                          renames (if new-k (conj renames [old-k new-k]) renames)]
-                      (recur (rest ks) renames))
-                    renames))
+        renames (reduce (fn [renames old-k]
+                          (let [v (get m1 old-k)]
+                            (if-let [new-k (first (filter #(= (get m2 %) v) ks2))]
+                              (conj renames [old-k new-k])
+                              renames)))
+                        {} ks1)
         ks1     (set/difference ks1 (set (keys renames)))
         ks2     (set/difference ks2 (set (vals renames)))
         assocs  (select-keys m2 (set/difference ks2 ks1))
